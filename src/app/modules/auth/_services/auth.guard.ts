@@ -6,20 +6,33 @@ import {
   RouterStateSnapshot,
 } from '@angular/router';
 import { AuthService } from './auth.service';
+import {DemoJWTAuthService} from './demoJWT-auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthGuard implements CanActivate {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService,
+              private demoJWTAuthService: DemoJWTAuthService) {}
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-    const currentUser = this.authService.currentUserValue;
+    const currentUser = this.demoJWTAuthService.currentUserValue;
     if (currentUser) {
-      // logged in so return true
-      return true;
+      return true;  // đc truy cập vào ko bị chặn
     }
 
-    // not logged in so redirect to login page with the return url
-    this.authService.logout();
-    return false;
+    this.demoJWTAuthService.demoLogOut();
+    return false; // chưa thì quay lại login
   }
+
+
+  // canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
+  //   const currentUser = this.authService.currentUserValue;
+  //   if (currentUser) {
+  //     // logged in so return true
+  //     return true;
+  //   }
+  //
+  //   // not logged in so redirect to login page with the return url
+  //   this.authService.logout();
+  //   return false;
+  // }
 }
