@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {Observable, Subscription} from 'rxjs';
-import {first} from 'rxjs/operators';
+import {catchError, first} from 'rxjs/operators';
 import {AuthService} from '../_services/auth.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {DemoJWTAuthService} from '../_services/demoJWT-auth.service';
@@ -21,6 +21,9 @@ export class LoginComponent implements OnInit, OnDestroy {
     hasError: boolean;
     returnUrl: string;
     isLoading$: Observable<boolean>;
+
+    // them
+    responsedata: any;
 
     // private fields
     private unsubscribe: Subscription[] = [];
@@ -46,13 +49,6 @@ export class LoginComponent implements OnInit, OnDestroy {
             this.route.snapshot.queryParams['returnUrl'.toString()] || '/';
     }
 
-    initForm() {
-        this.loginForm = this.fb.group({
-            username: [''],
-            password: [''],
-        });
-    }
-
     // convenience getter for easy access to form fields
     get f() {
         return this.loginForm.controls;
@@ -60,23 +56,8 @@ export class LoginComponent implements OnInit, OnDestroy {
 
     // initForm() {
     //   this.loginForm = this.fb.group({
-    //     email: [
-    //       this.defaultAuth.email,
-    //       Validators.compose([
-    //         Validators.required,
-    //         Validators.email,
-    //         Validators.minLength(3),
-    //         Validators.maxLength(320),
-    //       ]),
-    //     ],
-    //     password: [
-    //       this.defaultAuth.password,
-    //       Validators.compose([
-    //         Validators.required,
-    //         Validators.minLength(3),
-    //         Validators.maxLength(100),
-    //       ]),
-    //     ],
+    //     email: [],
+    //     password: [],
     //   });
     // }
     //
@@ -87,13 +68,21 @@ export class LoginComponent implements OnInit, OnDestroy {
     //     .pipe(first())
     //     .subscribe((user: UserModel) => {
     //       if (user) {
-    //         this.router.navigate([this.  returnUrl]);
+    //         this.router.navigate([this.returnUrl]);
     //       } else {
     //         this.hasError = true;
     //       }
     //     });
     //   this.unsubscribe.push(loginSubscr);
     // }
+
+
+    initForm() {
+        this.loginForm = this.fb.group({
+            username: [''],
+            password: [''],
+        });
+    }
 
     submit() {
         this.hasError = false;
@@ -103,7 +92,7 @@ export class LoginComponent implements OnInit, OnDestroy {
                 if (user) {
                     alert('Đăng nhập thành công');
                     // this.router.navigate([this.returnUrl]);
-                    this.router.navigate(['/dashboard']);
+                    this.router.navigate(['/builder']);
                 } else {
                     this.hasError = true;
                 }

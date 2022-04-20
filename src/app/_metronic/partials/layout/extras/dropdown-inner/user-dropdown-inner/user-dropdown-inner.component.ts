@@ -4,6 +4,7 @@ import { LayoutService } from '../../../../../core';
 import { UserModel } from '../../../../../../modules/auth/_models/user.model';
 import { AuthService } from '../../../../../../modules/auth/_services/auth.service';
 import {DemoJWTAuthService} from '../../../../../../modules/auth/_services/demoJWT-auth.service';
+import {Router} from '@angular/router';
 @Component({
   selector: 'app-user-dropdown-inner',
   templateUrl: './user-dropdown-inner.component.html',
@@ -13,7 +14,11 @@ export class UserDropdownInnerComponent implements OnInit {
   extrasUserDropdownStyle: 'light' | 'dark' = 'light';
   user$: Observable<UserModel>;
 
-  constructor(private layout: LayoutService, private auth: AuthService, private demoJWTService: DemoJWTAuthService) {}
+  constructor(
+      private router: Router,
+      private layout: LayoutService,
+      private auth: AuthService,
+      private demoJWTService: DemoJWTAuthService) {}
 
   ngOnInit(): void {
     this.extrasUserDropdownStyle = this.layout.getProp(
@@ -26,6 +31,7 @@ export class UserDropdownInnerComponent implements OnInit {
   logout() {
     // this.auth.logout();
     this.demoJWTService.demoLogOut();
-    document.location.reload();
+    this.router.navigate(['/auth/login']);
+    // document.location.reload();
   }
 }

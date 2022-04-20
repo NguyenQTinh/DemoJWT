@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NavigationStart, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { TranslationService } from '../../../../../modules/i18n/translation.service';
+import {DemoJWTAuthService} from '../../../../../modules/auth/_services/demoJWT-auth.service';
 
 interface LanguageFlag {
   lang: string;
@@ -51,7 +52,8 @@ export class LanguageSelectorComponent implements OnInit {
   ];
   constructor(
     private translationService: TranslationService,
-    private router: Router
+    private router: Router,
+    private demoJWTService: DemoJWTAuthService
   ) { }
 
   ngOnInit() {
@@ -78,6 +80,11 @@ export class LanguageSelectorComponent implements OnInit {
       }
     });
     this.translationService.setLanguage(lang);
+  }
+
+  logOut() {
+    this.demoJWTService.demoLogOut();
+    this.router.navigate(['/auth/login']);
   }
 
   setSelectedLanguage(): any {
