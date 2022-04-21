@@ -2,13 +2,11 @@ import {HttpClient} from '@angular/common/http';
 import {Injectable, OnDestroy} from '@angular/core';
 import {Router} from '@angular/router';
 import {BehaviorSubject, Observable, Subscription} from 'rxjs';
-import {AuthHTTPService} from './auth-http';
 import {environment} from '../../../../environments/environment';
 import {UserModel} from '../_models/user.model';
 import {DftUserModel} from '../_models/dftUser.model';
 import jwtDecode from 'jwt-decode';
 import {map} from 'rxjs/operators';
-import {AuthModel} from '../_models/auth.model';
 
 // @ts-ignore
 @Injectable({
@@ -20,7 +18,6 @@ export class DemoJWTAuthService implements OnDestroy {
 
     constructor(private http: HttpClient,
                 private router: Router,
-                private authHttpService: AuthHTTPService,
     ) {
         // this.currentUserSubject = new BehaviorSubject<UserModel>(JSON.parse(localStorage.getItem('token')));
         this.currentUserSubject = new BehaviorSubject<UserModel>(undefined);
@@ -60,12 +57,12 @@ export class DemoJWTAuthService implements OnDestroy {
         return this.http.post<any>(`${environment.apiUrl}/auth/login`, {username, password}).pipe(
             map(user => {
                 console.log(user);
-                localStorage.setItem(this.token, JSON.stringify(this.testString));
-                localStorage.setItem('token1', JSON.stringify(this.testString.token));
-                localStorage.setItem('refreshToken1', JSON.stringify(this.testString.refreshToken));
+                localStorage.setItem('tokenAll', JSON.stringify(user));
+                localStorage.setItem('token1', user.token);
+                localStorage.setItem('refreshToken1', user.refreshToken);
 
-                this.currentUserSubject.next(this.testString);
-                return this.testString; // return token old
+                this.currentUserSubject.next(user);
+                return user; // return token old
             })
         );
     }
@@ -73,9 +70,8 @@ export class DemoJWTAuthService implements OnDestroy {
     demoLogOut() {
         // remove user from local storage to log user out
         alert('Bạn sẽ logout');
-        localStorage.removeItem(this.token);
+        localStorage.removeItem('tokenAll');
         this.currentUserSubject.next(null);
-        // this.router.navigate(['/login']);
         this.router.navigate(['/auth/login'], {
             queryParams: {},
         });
@@ -92,13 +88,13 @@ export class DemoJWTAuthService implements OnDestroy {
     // refreshToken
     demoRefreshToken(): Observable<any> {
         // @ts-ignore
-        return this.http.post<any>(`${environment.apiUrl}/auth/refreshtoken`,
+        return this.http.post<any>(`${environment.apiUrl}/auth/token`,
             {
                 token: this.getToken(),
                 refreshToken: this.getRefreshToken()
-            })
-            .subscribe(res => console.log(res)
-            );
+            });
+        // .subscribe(res => console.log(res)
+        // );
     }
 
     // lưu data payload
@@ -122,6 +118,10 @@ export class DemoJWTAuthService implements OnDestroy {
         };
         console.log('Data Payload: ', dftUserModel); // log thành công
         return dftUserModel;
+    }
+
+    getAllClGroupService(): Observable<any> {
+        return this.http.get<any>(environment.apiUrl + '/clAlarm?page=0&pageSize=10');
     }
 }
 

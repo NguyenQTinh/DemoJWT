@@ -1,7 +1,7 @@
 import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpClientModule } from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
 import { ClipboardModule } from 'ngx-clipboard';
 import { TranslateModule } from '@ngx-translate/core';
@@ -16,8 +16,10 @@ import { HighlightModule, HIGHLIGHT_OPTIONS } from 'ngx-highlightjs';
 import { SplashScreenModule } from './_metronic/partials/layout/splash-screen/splash-screen.module';
 // #fake-start#
 import { FakeAPIService } from './_fake/fake-api.service';
+import {AuthInterceptor} from './modules/auth/_services/authInterceptor';
+import {DemoJWTAuthService} from './modules/auth/_services/demoJWT-auth.service';
 // #fake-end#
-
+//
 function appInitializer(authService: AuthService) {
   return () => {
     return new Promise((resolve) => {
@@ -51,10 +53,14 @@ function appInitializer(authService: AuthService) {
   ],
   providers: [
     {
-      provide: APP_INITIALIZER,
-      useFactory: appInitializer,
+      // provide: APP_INITIALIZER,
+      // useFactory: appInitializer,
+      // multi: true,
+      // deps: [AuthService],
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
       multi: true,
-      deps: [AuthService],
+      // deps: [DemoJWTAuthService],
     },
     {
       provide: HIGHLIGHT_OPTIONS,

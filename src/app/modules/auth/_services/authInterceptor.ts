@@ -11,38 +11,24 @@ import {catchError, switchMap} from 'rxjs/operators';
 })
 export class AuthInterceptor implements HttpInterceptor {
     private isRefreshing = false;
-    private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
+    private refreshTokenSubject: BehaviorSubject<any>;
 
     constructor(private demoJWTService: DemoJWTAuthService) {
+        this.refreshTokenSubject = new BehaviorSubject<any>(null);
     }
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        // letDemoJWTService = this.demoJWTService.
-
-        // const token = JSON.parse(localStorage.getItem('token') as string);
-        // const token = this.demoJWTService.getToken();
-        // if (token) {
-        //     // @ts-ignore
-        //     request = request.clone({
-        //         setHeaders: {Authorization: `Bearer ${token}`}
-        //     });
-        // }
-        // // @ts-ignore
-        // // đăng xuất
-        // return next.handle(request);
-
-        const token = this.addTokenHeader(req, this.demoJWTService.getToken());
+        const token = this.addTokenHeader(req, localStorage.getItem('token1'));
+        console.log('1', token);
         if (token != null) {
             this.addTokenHeader(req, token);
         }
 
         // xử lý khi hết hạn
-        return next.handle(req).pipe(
-            catchError (err => {
-                console.log(err);
+        return next.handle(token).pipe(
+            catchError(err => {
                 if (err instanceof HttpErrorResponse && err.status === 401) {
                     console.log(err.status);
-                    console.log(err.statusText);
                     return this.handle401Error(req, next);
                 }
                 console.log(err);
@@ -52,21 +38,20 @@ export class AuthInterceptor implements HttpInterceptor {
     }
 
     private handle401Error(request: HttpRequest<any>, next: HttpHandler) {
+        console.log('12');
         if (!this.isRefreshing) {
             this.isRefreshing = true;
             this.refreshTokenSubject.next(null);
             const token = this.demoJWTService.getRefreshToken();
             if (token) {
+                console.log(34);
                 return this.demoJWTService.demoRefreshToken().pipe(
                     switchMap((data: any) => {
-                        console.log(data);
                         this.isRefreshing = false;
+                        localStorage.setItem('tokenAll', data);
                         localStorage.setItem('token1', data.token);
                         localStorage.setItem('refreshToken1', data.refreshToken);
-                        return next.handle(this.addTokenHeader(request, data.token1));
-                    // data trả về token mới
-                    // token1(cũ) = token mới
-                    // refreshToken1(cũ) = refreshToken mới
+                        return next.handle(this.addTokenHeader(request, localStorage.getItem('token1')));
                     }),
                     catchError((err) => {
                         this.isRefreshing = false;
@@ -74,6 +59,7 @@ export class AuthInterceptor implements HttpInterceptor {
                         return throwError(err);
                     })
                 );
+                console.log('chua1');
             }
         }
     }
@@ -81,7 +67,7 @@ export class AuthInterceptor implements HttpInterceptor {
     // Đính kèm token
     addTokenHeader(req: HttpRequest<any>, token: any) {
         return req.clone({
-            headers: req.headers.set('Authorization', 'bear' + token),
+            setHeaders: {Authorization: `Bearer ${token}`},
         });
     }
 

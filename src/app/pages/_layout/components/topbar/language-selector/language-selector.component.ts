@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationStart, Router } from '@angular/router';
-import { filter } from 'rxjs/operators';
+import {catchError, filter, tap} from 'rxjs/operators';
 import { TranslationService } from '../../../../../modules/i18n/translation.service';
 import {DemoJWTAuthService} from '../../../../../modules/auth/_services/demoJWT-auth.service';
+import {of, Subscription} from 'rxjs';
 
 interface LanguageFlag {
   lang: string;
@@ -50,6 +51,8 @@ export class LanguageSelectorComponent implements OnInit {
       flag: './assets/media/svg/flags/195-france.svg',
     },
   ];
+
+  private subscriptions: Subscription[] = [];
   constructor(
     private translationService: TranslationService,
     private router: Router,
@@ -85,6 +88,19 @@ export class LanguageSelectorComponent implements OnInit {
   logOut() {
     this.demoJWTService.demoLogOut();
     this.router.navigate(['/auth/login']);
+  }
+
+  getClAlarm() {
+    alert('chao Tinh');
+    const sbgetClalarm = this.demoJWTService.getAllClGroupService().pipe(
+      tap (res => {
+        console.log('Giá trị: ', res);
+      }),
+      catchError( (err) => {
+                   return of(err);
+      })
+    ).subscribe(res => console.log('subscribe: ', res));
+    this.subscriptions.push(sbgetClalarm);
   }
 
   setSelectedLanguage(): any {
