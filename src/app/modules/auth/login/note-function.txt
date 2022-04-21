@@ -1,0 +1,48 @@
+interface AuthResponseData {
+    id: string,
+    username: string, email: string,
+    expirenIn: string, localId: string,
+    registered: boolean
+} // Thằng quan sát , kiểu như một observable, định dạng dữ liệu trả về
+
+
+// tức khi login hoặc logout, token expired: ta cũng clear token
+user = new BehaviorSubject<User>(null);
+
+tap(): là 1 operatir cho phép hiện chúng ta thực hiện một vài hành động nhưng ko làm thay đổi trả về
+
+//create a new user
+singup(username: string, password: string) {
+    return this.http.post<AuthResponseData>(this.API, {username, password})
+    .pipe(
+        catchError(this.handleError),
+        tap(resData => {
+            this.handleAuthentication(resData.email,resData.localId, resData.idToken, resData.expirationDate)
+         })
+    );
+}
+
+//đăng nhập
+login(username: string, password: string) {
+    return this.http.post<AuthResponseData>(this.API, {username, password})
+    .pipe(
+        catchError(this.handleError),
+        tap(resData => {
+            this.handleAuthentication(resData.email,resData.localId, resData.idToken, resData.expirationDate)
+        })
+    )
+}
+
+private handleAuthentication(email: string, userId: str, token: str, exporesIn: number){
+    const expirationDate = new Date (newDate().getTime() + exporesIn*1000)
+    const user = new User(email,localId, idToken, expirationDate);
+     this.user.next(user);
+}
+
+private handleError(err: HttpErrorResponse) {
+    let errorMessage = 'An unknown error occurred!'
+    if(!err.error || !err.error.error) {
+        return throwError(errorMessage)
+    }
+}
+

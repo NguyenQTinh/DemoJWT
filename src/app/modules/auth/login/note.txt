@@ -1,0 +1,72 @@
+- Cơ bản:
+1.logIn(): User đăng nhập vào, nếu đúng sẽ được nhận một chuối JWT trả về
+    - Lưu chuỗi JWT vào localStorage dạng key-value
+    - JWT: header,payload, singnature
+    - bên trong payload có các trường thông tin,
+        {
+           'userId':,
+           ...
+           'iss':,
+           'iat':,
+           'exp':,
+        }
+
+2.logOut(): chỉ cần localStorage.remove('key') => là ok
+
+
+JSON.parse(): nhận vào chuỗi JSON -> chuyển thành Object
+    => Dùng để login() xong => lưu vào localStorage
+
+JSON.stringify(): ~ JSON.parse()
+    => Lấy Object chuyển thành chuỗi JSON
+
+BehaviorSubject<>: luôn cần giá trị khởi tạo
+            + thằng này khác với thằng Observable chút: nhưng chức năng là gần như nhau
+
+HttpInterceptor:
+            + dùng để đính kèm token vào header api call.
+            + kiểm tra người dùng đã được xác thực chưa
+            + xử lý lỗi
+
+Playload: sau khi nhận được token
+       - dùng library jwt-decode: để giải mã
+       - sau rồi lưu vào một interface
+       - demo code
+       - CoreUser: là một Object interface
+
+       private getUserFromToken(): CoreUser{
+           const token = localStorage.getItem('token');
+           if(token === null){
+             return null;
+           }
+
+           // Giải mã token library jwt-decode
+           const tokenPayload: any = decode(token);
+           const coreUser: CoreUser = {
+             username: tokenPayload.username,
+             name: tokenPayload.name,
+             authorities: tokenPayload.authorities.map((x: any) => x.authority)
+           };
+           return coreUser;
+         }
+
+UserModel: mục đích lưu trữ data của một user và nó có thể giúp ta xác thực xem mã thông báo đó còn hợp lệ hay ko
+    export class User {
+        constructor(
+            public email: string, public id: string, private _token:string, private _tokenExpirationData: Date
+        ){}
+
+        getter token() {
+            if(!this._tokenExpirationDate || new Date > this._tokenExpirationDate){
+                // Tức kiểm tra 1 là ko tồn tại ngày hết hạn
+                // hoặc 2 là new Date > this._tokenExpirationDate thì nó cũng ko dùng đc nữa
+                // tức là cho dù nó có trả ra được mã Token thì vẫn bị null do hết hạn
+                return null;
+            }
+                return this._token
+        }
+    }
+
+    //private: tính bảo mật, nếu bạn muốn truy cập nó chỉ cần bạn user.getter
+
+getter : người dùng ko thể ghi đè lên được
