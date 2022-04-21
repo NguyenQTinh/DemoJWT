@@ -24,8 +24,8 @@ export class UserDropdownInnerComponent implements OnInit {
     this.extrasUserDropdownStyle = this.layout.getProp(
       'extras.user.dropdown.style'
     );
-    // this.user$ = this.auth.currentUserSubject.asObservable();
-    this.user$ = this.demoJWTService.currentUserSubject.asObservable();
+    this.user$ = this.auth.currentUserSubject.asObservable();
+    // this.user$ = this.demoJWTService.currentUserSubject.asObservable();
   }
 
   logout() {

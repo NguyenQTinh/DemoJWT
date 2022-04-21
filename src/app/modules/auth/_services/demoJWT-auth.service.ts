@@ -17,11 +17,6 @@ import {AuthModel} from '../_models/auth.model';
 
 // Custom DemoJWTAuthService
 export class DemoJWTAuthService implements OnDestroy {
-    private unsubscribe: Subscription[] = [];
-    currentUserSubject: BehaviorSubject<UserModel>;
-    currentUser$: Observable<UserModel>;
-
-    token = `${environment.appVersion}-${environment.USERDATA_KEY}`; // key token mặc định
 
     constructor(private http: HttpClient,
                 private router: Router,
@@ -31,10 +26,6 @@ export class DemoJWTAuthService implements OnDestroy {
         this.currentUserSubject = new BehaviorSubject<UserModel>(undefined);
         this.currentUser$ = this.currentUserSubject.asObservable();
         this.getInforUserToken();
-    }
-
-    ngOnDestroy(): void {
-        throw new Error('Method not implemented.');
     }
 
     // Cho phép các thành phần khác nhanh chóng nhận được giá tri của user hiện tại
@@ -48,20 +39,33 @@ export class DemoJWTAuthService implements OnDestroy {
         return this.currentUserSubject.next(user);
     }
 
+    private unsubscribe: Subscription[] = [];
+    currentUserSubject: BehaviorSubject<UserModel>;
+    currentUser$: Observable<UserModel>;
+
+    token = `${environment.appVersion}-${environment.USERDATA_KEY}`; // key token mặc định
+
+    testString?: any = {
+        token: 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzeXNhZG1pbkB0aGluZ3Nib2FyZC5vcmciLCJzY29wZXMiOlsiU1lTX0FETUlOIl0sInVzZXJJZCI6ImRkOWM5ZmMwLTU3NjctMTFlYy1hMTQxLWExZjM4MTFhMjQ2ZCIsImZpcnN0TmFtZSI6IiIsImxhc3ROYW1lIjoiU1lTVEVNIEFETUlOIiwiZW5hYmxlZCI6dHJ1ZSwiaXNQdWJsaWMiOmZhbHNlLCJ0ZW5hbnRJZCI6IjEzODE0MDAwLTFkZDItMTFiMi04MDgwLTgwODA4MDgwODA4MCIsImN1c3RvbWVySWQiOiIxMzgxNDAwMC0xZGQyLTExYjItODA4MC04MDgwODA4MDgwODAiLCJpc3MiOiJ0aGluZ3Nib2FyZC5pbyIsImlhdCI6MTY1MDQyOTkyMywiZXhwIjoxNjUwNDM4OTIzfQ.8gUsS8MUds5tAT7ra6IcYiN5YivFYwrUyiV6P9RJ4bxA4sde5T8pYJWaIzwGmL2lf-N4ydy37NBmwbjA9j8pQA',
+        refreshToken: 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ2YW5iaW5oZG9hbjk3MUBnbWFpbC5jb20iLCJzY29wZXMiOlsiUkVGUkVTSF9UT0tFTiJdLCJ1c2VySWQiOiI3MTlmYWIyMC04ZGIxLTExZWMtYjQzYi1mNTMyODA0NDFmZmMiLCJpc1B1YmxpYyI6ZmFsc2UsInRlbmFudElkIjoiNzE0NzUxZjAtOGRiMS0xMWVjLWI0M2ItZjUzMjgwNDQxZmZjIiwiY3VzdG9tZXJJZCI6IjEzODE0MDAwLTFkZDItMTFiMi04MDgwLTgwODA4MDgwODA4MCIsImlzcyI6InRoaW5nc2JvYXJkLmlvIiwianRpIjoiMmE4MzY5Y2MtOGZiNS00YmJkLWIwNDMtZDNjOTg2ZDBkNzRlIiwiaWF0IjoxNjUwNTEwOTQzLCJleHAiOjE2NTExMTU3NDN9.guGzZD2AIQgQAzHj11ZXE51p-hvl2s56y1cRWtD3DmwlpjVPhUafztRSnbCGhGu3WWDfcYYJuHj-G_k5zAWoMw'
+    };
+
+    ngOnDestroy(): void {
+        throw new Error('Method not implemented.');
+    }
+
     // Khi thành công api trả về chi tiết người dùng và JWT + refreshToken,
     // Và được công bố cho tất cả subscribers khi gọi đến this.currentUserSubject.next(user);// withCredentials
     demoLogIn(username: string, password: string): Observable<any> {
         return this.http.post<any>(`${environment.apiUrl}/auth/login`, {username, password}).pipe(
             map(user => {
                 console.log(user);
-                localStorage.setItem(this.token, JSON.stringify(user));
-                localStorage.setItem('token1', JSON.stringify(user.token));
-                localStorage.setItem('refreshToken1', JSON.stringify(user.refreshToken));
+                localStorage.setItem(this.token, JSON.stringify(this.testString));
+                localStorage.setItem('token1', JSON.stringify(this.testString.token));
+                localStorage.setItem('refreshToken1', JSON.stringify(this.testString.refreshToken));
 
-                // const result = this.setAuthFromLocalStorage(user);
-                this.currentUserSubject.next(user);
-                // return result;
-                return user;
+                this.currentUserSubject.next(this.testString);
+                return this.testString; // return token old
             })
         );
     }

@@ -59,10 +59,14 @@ export class AuthInterceptor implements HttpInterceptor {
             if (token) {
                 return this.demoJWTService.demoRefreshToken().pipe(
                     switchMap((data: any) => {
+                        console.log(data);
                         this.isRefreshing = false;
-                        // localStorage.setItem('token1', data.token);
-                        // localStorage.setItem('refreshToken1', data.refreshToken);
-                        return next.handle(this.addTokenHeader(request, data.token));
+                        localStorage.setItem('token1', data.token);
+                        localStorage.setItem('refreshToken1', data.refreshToken);
+                        return next.handle(this.addTokenHeader(request, data.token1));
+                    // data trả về token mới
+                    // token1(cũ) = token mới
+                    // refreshToken1(cũ) = refreshToken mới
                     }),
                     catchError((err) => {
                         this.isRefreshing = false;
