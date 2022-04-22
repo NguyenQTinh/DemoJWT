@@ -19,7 +19,6 @@ export class AuthInterceptor implements HttpInterceptor {
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         const token = this.addTokenHeader(req, localStorage.getItem('token1'));
-        console.log('1', token);
         if (token != null) {
             this.addTokenHeader(req, token);
         }
@@ -38,13 +37,11 @@ export class AuthInterceptor implements HttpInterceptor {
     }
 
     private handle401Error(request: HttpRequest<any>, next: HttpHandler) {
-        console.log('12');
         if (!this.isRefreshing) {
             this.isRefreshing = true;
             this.refreshTokenSubject.next(null);
-            const token = this.demoJWTService.getRefreshToken();
-            if (token) {
-                console.log(34);
+            const refToken = this.demoJWTService.getRefreshToken();
+            if (refToken) {
                 return this.demoJWTService.demoRefreshToken().pipe(
                     switchMap((data: any) => {
                         this.isRefreshing = false;
@@ -70,5 +67,9 @@ export class AuthInterceptor implements HttpInterceptor {
             setHeaders: {Authorization: `Bearer ${token}`},
         });
     }
-
 }
+
+/* 1. check xem token còn hạn ko, gán mã lỗi === 401.
+* gọi đên api rồi map lại
+*
+* */

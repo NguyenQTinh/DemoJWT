@@ -40,12 +40,13 @@ export class DemoJWTAuthService implements OnDestroy {
     currentUserSubject: BehaviorSubject<UserModel>;
     currentUser$: Observable<UserModel>;
 
-    token = `${environment.appVersion}-${environment.USERDATA_KEY}`; // key token mặc định
 
-    testString?: any = {
-        token: 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzeXNhZG1pbkB0aGluZ3Nib2FyZC5vcmciLCJzY29wZXMiOlsiU1lTX0FETUlOIl0sInVzZXJJZCI6ImRkOWM5ZmMwLTU3NjctMTFlYy1hMTQxLWExZjM4MTFhMjQ2ZCIsImZpcnN0TmFtZSI6IiIsImxhc3ROYW1lIjoiU1lTVEVNIEFETUlOIiwiZW5hYmxlZCI6dHJ1ZSwiaXNQdWJsaWMiOmZhbHNlLCJ0ZW5hbnRJZCI6IjEzODE0MDAwLTFkZDItMTFiMi04MDgwLTgwODA4MDgwODA4MCIsImN1c3RvbWVySWQiOiIxMzgxNDAwMC0xZGQyLTExYjItODA4MC04MDgwODA4MDgwODAiLCJpc3MiOiJ0aGluZ3Nib2FyZC5pbyIsImlhdCI6MTY1MDQyOTkyMywiZXhwIjoxNjUwNDM4OTIzfQ.8gUsS8MUds5tAT7ra6IcYiN5YivFYwrUyiV6P9RJ4bxA4sde5T8pYJWaIzwGmL2lf-N4ydy37NBmwbjA9j8pQA',
-        refreshToken: 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ2YW5iaW5oZG9hbjk3MUBnbWFpbC5jb20iLCJzY29wZXMiOlsiUkVGUkVTSF9UT0tFTiJdLCJ1c2VySWQiOiI3MTlmYWIyMC04ZGIxLTExZWMtYjQzYi1mNTMyODA0NDFmZmMiLCJpc1B1YmxpYyI6ZmFsc2UsInRlbmFudElkIjoiNzE0NzUxZjAtOGRiMS0xMWVjLWI0M2ItZjUzMjgwNDQxZmZjIiwiY3VzdG9tZXJJZCI6IjEzODE0MDAwLTFkZDItMTFiMi04MDgwLTgwODA4MDgwODA4MCIsImlzcyI6InRoaW5nc2JvYXJkLmlvIiwianRpIjoiMmE4MzY5Y2MtOGZiNS00YmJkLWIwNDMtZDNjOTg2ZDBkNzRlIiwiaWF0IjoxNjUwNTEwOTQzLCJleHAiOjE2NTExMTU3NDN9.guGzZD2AIQgQAzHj11ZXE51p-hvl2s56y1cRWtD3DmwlpjVPhUafztRSnbCGhGu3WWDfcYYJuHj-G_k5zAWoMw'
-    };
+    // testString?: any = {
+    // tslint:disable-next-line:max-line-length
+    //     token: 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzeXNhZG1pbkB0aGluZ3Nib2FyZC5vcmciLCJzY29wZXMiOlsiU1lTX0FETUlOIl0sInVzZXJJZCI6ImRkOWM5ZmMwLTU3NjctMTFlYy1hMTQxLWExZjM4MTFhMjQ2ZCIsImZpcnN0TmFtZSI6IiIsImxhc3ROYW1lIjoiU1lTVEVNIEFETUlOIiwiZW5hYmxlZCI6dHJ1ZSwiaXNQdWJsaWMiOmZhbHNlLCJ0ZW5hbnRJZCI6IjEzODE0MDAwLTFkZDItMTFiMi04MDgwLTgwODA4MDgwODA4MCIsImN1c3RvbWVySWQiOiIxMzgxNDAwMC0xZGQyLTExYjItODA4MC04MDgwODA4MDgwODAiLCJpc3MiOiJ0aGluZ3Nib2FyZC5pbyIsImlhdCI6MTY1MDQyOTkyMywiZXhwIjoxNjUwNDM4OTIzfQ.8gUsS8MUds5tAT7ra6IcYiN5YivFYwrUyiV6P9RJ4bxA4sde5T8pYJWaIzwGmL2lf-N4ydy37NBmwbjA9j8pQA',
+    // tslint:disable-next-line:max-line-length
+    //     refreshToken: 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ2YW5iaW5oZG9hbjk3MUBnbWFpbC5jb20iLCJzY29wZXMiOlsiUkVGUkVTSF9UT0tFTiJdLCJ1c2VySWQiOiI3MTlmYWIyMC04ZGIxLTExZWMtYjQzYi1mNTMyODA0NDFmZmMiLCJpc1B1YmxpYyI6ZmFsc2UsInRlbmFudElkIjoiNzE0NzUxZjAtOGRiMS0xMWVjLWI0M2ItZjUzMjgwNDQxZmZjIiwiY3VzdG9tZXJJZCI6IjEzODE0MDAwLTFkZDItMTFiMi04MDgwLTgwODA4MDgwODA4MCIsImlzcyI6InRoaW5nc2JvYXJkLmlvIiwianRpIjoiMmE4MzY5Y2MtOGZiNS00YmJkLWIwNDMtZDNjOTg2ZDBkNzRlIiwiaWF0IjoxNjUwNTEwOTQzLCJleHAiOjE2NTExMTU3NDN9.guGzZD2AIQgQAzHj11ZXE51p-hvl2s56y1cRWtD3DmwlpjVPhUafztRSnbCGhGu3WWDfcYYJuHj-G_k5zAWoMw'
+    // };
 
     ngOnDestroy(): void {
         throw new Error('Method not implemented.');
@@ -99,7 +100,7 @@ export class DemoJWTAuthService implements OnDestroy {
 
     // lưu data payload
     private getInforUserToken(): DftUserModel {
-        const tokenstr = localStorage.getItem(this.token);
+        const tokenstr = localStorage.getItem('tokenAll');
         if (tokenstr === null) {
             return null;
         }
